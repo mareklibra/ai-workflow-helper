@@ -15,11 +15,15 @@ from lib.repository import VectorRepository
 from lib.retriever import Retriever
 from lib.validator import OutputValidator
 from lib.serverless_validation import ServerlessValidation
-
+from langchain.globals import set_debug
 
 from flask import Flask, g
 
-logging.basicConfig(stream=sys.stderr, level=os.environ.get('LOG_LEVEL', 'INFO').upper())
+def setup_logging():
+    log_level = os.environ.get('LOG_LEVEL', 'INFO').upper()
+    logging.basicConfig(stream=sys.stderr, level=log_level)
+    if log_level == "DEBUG":
+        set_debug(True)
 
 MODELS_EMBEDDINGS = {
     "llama3.2:3b": 3072
@@ -132,7 +136,7 @@ def validate_json(obj, file_path):
     click.echo(serverless_validation)
     click.echo(f"The workflow can compile, result: {valid}")
 
-
+setup_logging()
 cli.add_command(load_data)
 cli.add_command(run)
 cli.add_command(sample_request)
